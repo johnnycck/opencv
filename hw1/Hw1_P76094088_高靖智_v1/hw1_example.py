@@ -24,6 +24,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn1_3.clicked.connect(self.on_btn1_3_click)
         self.btn1_4.clicked.connect(self.on_btn1_4_click)
         self.btn2_1.clicked.connect(self.on_btn2_1_click)
+        self.btn2_2.clicked.connect(self.on_btn2_2_click)
+        self.btn2_3.clicked.connect(self.on_btn2_3_click)
         self.btn3_1.clicked.connect(self.on_btn3_1_click)
         self.btn4_1.clicked.connect(self.on_btn4_1_click)
         self.btn4_2.clicked.connect(self.on_btn4_2_click)
@@ -86,6 +88,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cv.imshow('Blending',dst)
 
     def on_btn2_1_click(self):
+        img = cv.imread( '../Q2_image/Cat.png', cv.IMREAD_COLOR )
+        cv.imshow('origin', img)
+        dst = cv.medianBlur(img,7)
+        cv.imshow('after median filter', dst)
+
+    def on_btn2_2_click(self):
+        img = cv.imread( '../Q2_image/Cat.png', cv.IMREAD_COLOR )
+        cv.imshow('origin', img)
+        dst = cv.medianBlur(img,7)
+        cv.imshow('after median filter', dst)
+
+    def on_btn2_3_click(self):
         img = cv.imread( '../Q2_image/Cat.png', cv.IMREAD_COLOR )
         cv.imshow('origin', img)
         dst = cv.medianBlur(img,7)
