@@ -232,11 +232,11 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.btn2_1.setText(_translate("MainWindow", "2.1 Edge Detection"))
+        self.btn2_1.setText(_translate("MainWindow", "2.1 Median filter"))
         self.btn4_1.setText(_translate("MainWindow", "4.1 Global Threshold"))
         self.btn4_2.setText(_translate("MainWindow", "4.2 Local Threshold"))
         self.label.setText(_translate("MainWindow", "1. Image Processing"))
-        self.label_2.setText(_translate("MainWindow", "2. Edge Detection"))
+        self.label_2.setText(_translate("MainWindow", "2. Image Smoothing"))
         self.label_3.setText(_translate(
             "MainWindow", "5. Image Transformation"))
         self.label_4.setText(_translate("MainWindow", "4. Adaptive Threshold"))

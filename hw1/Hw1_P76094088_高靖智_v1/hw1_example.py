@@ -34,78 +34,62 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print( p )
     # button for problem 1.1
     def on_btn1_1_click(self):
-        dog = cv.imread( '../img/dog.bmp', cv.IMREAD_COLOR )
-        dog = cv.cvtColor(dog, cv.COLOR_BGR2RGB)
-        print('Height:', dog.shape[0])
-        print('width:', dog.shape[1])
-        plt.imshow(dog)
+        uncleroger = cv.imread( '../Q1_image/Uncle_Roger.jpg', cv.IMREAD_COLOR )
+        uncleroger = cv.cvtColor(uncleroger, cv.COLOR_BGR2RGB)
+        print('Height:', uncleroger.shape[0])
+        print('width:', uncleroger.shape[1])
+        plt.imshow(uncleroger)
         plt.xticks([]), plt.yticks([])
         plt.show()
-        #cv.waitKey( 0 )
-        #cv.destroyWindow('image')
+        cv.waitKey( 0 )
+        cv.destroyWindow('uncleroger')
 
     def on_btn1_2_click(self):
-        img = cv.imread( '../img/color.png', cv.IMREAD_COLOR )
-        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-        #rbg = img[...,[1,0,2]]
-        rbg = img[...,[2,0,1]]
-        plt.imshow(rbg)
-        plt.xticks([]), plt.yticks([])
-        plt.show()
+        img = cv.imread( '../Q1_image/Flower.jpg', cv.IMREAD_COLOR )
+        #blue
+        img[:,:,1] = 0
+        img[:,:,2] = 0
+        cv.imshow('blue_img', img)
+
+        img = cv.imread( '../Q1_image/Flower.jpg', cv.IMREAD_COLOR )
+        #green
+        img[:,:,0] = 0
+        img[:,:,2] = 0
+        cv.imshow('green_img', img)
+
+        img = cv.imread( '../Q1_image/Flower.jpg', cv.IMREAD_COLOR )
+        # red
+        img[:,:,0] = 0
+        img[:,:,1] = 0
+        cv.imshow('red_img', img)
 
     def on_btn1_3_click(self):
-        dog = cv.imread( '../img/dog.bmp', cv.IMREAD_COLOR )
-        dog = cv.cvtColor(dog, cv.COLOR_BGR2RGB)
-        dog__f = cv.flip(dog, 1)
-        plt.imshow(dog__f)
+        uncleroger = cv.imread( '../Q1_image/Uncle_Roger.jpg', cv.IMREAD_COLOR )
+        uncleroger = cv.cvtColor(uncleroger, cv.COLOR_BGR2RGB)
+        uncleroger__f = cv.flip(uncleroger, 1)
+        plt.imshow(uncleroger__f)
         plt.xticks([]), plt.yticks([])
         plt.show()
 
     def on_btn1_4_click(self):
         #load image
-        def Chang(x):
-            hul = cv.getTrackbarPos('Blend', '4')
-            dst = cv.addWeighted(img1,hul/100,img2,(100-hul)/100,0)
-            cv.imshow('4',dst)
-        dog = cv.imread( '../img/dog.bmp', cv.IMREAD_COLOR )
-        img1 = cv.cvtColor(dog, cv.COLOR_BGR2RGB)
+        def Change(x):
+            alpha = cv.getTrackbarPos('Blend', 'Blending')/100
+            dst = cv.addWeighted(img1,alpha,img2,1-alpha,0)
+            cv.imshow('Blending',dst)
+        img1 = cv.imread( '../Q1_image/Uncle_Roger.jpg', cv.IMREAD_COLOR )
         img2 = cv.flip(img1, 1)
-        cv.namedWindow('4')
-        cv.createTrackbar('Blend', '4', 0,100,Chang)
-        # fig = gcf()
-        # fig.canvas.manager.window.raise_()
-        dst = cv.addWeighted(img1,1,img2,0,0) #dst = img*1+dst*0+gamma
-        plt.imshow('4',dst)
-        plt.show()
-
-        # #initial image alpha = 0
-        # dst = cv.addWeighted(img1, 0, img2, 1, 0)
-        # plt.imshow(dst)
-
-        # #adjust the image position
-        # plt.subplots_adjust(left=0.25, bottom=0.25)
-
-        # #setting of trackbar
-        # axcolor = 'lightgoldenrodyellow'
-        # axamp = plt.axes([0.25, 0.15, 0.65, 0.03], facecolor=axcolor)
-        # bar = Slider(axamp, 'BLEND', 0, 1, 0)
-        # #plt.show()
-        # def update(val):
-        #     alpha = bar.val
-        #     beta = 1 - alpha
-        #     dst.set_data(img1, alpha, img2, beta, 0)
-        #     draw()
-        # bar.on_changed(update)
-        # plt.show()
-
+        cv.namedWindow('Blending')
+        cv.createTrackbar('Blend', 'Blending', 0,100,Change)
+        # default image : flipped image
+        dst = cv.addWeighted(img1,0,img2,1,0)
+        cv.imshow('Blending',dst)
 
     def on_btn2_1_click(self):
-        screw = cv.imread( '../img/M8.jpg', cv.IMREAD_COLOR )
-        screw = cv.cvtColor(screw, cv.COLOR_BGR2RGB)
-        blur = cv.GaussianBlur(screw,(3,3),0)
-        #screw_G = cv.cvtColor(screw,cv.COLOR_BGR2GRAY)
-        plt.imshow(screw)
-        plt.show()
+        img = cv.imread( '../Q2_image/Cat.png', cv.IMREAD_COLOR )
+        cv.imshow('origin', img)
+        dst = cv.medianBlur(img,7)
+        cv.imshow('after median filter', dst)
 
     def on_btn3_1_click(self):
         pass
