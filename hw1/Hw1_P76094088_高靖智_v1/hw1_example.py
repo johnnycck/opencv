@@ -5,11 +5,13 @@ from hw1_ui import Ui_MainWindow
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit
 from matplotlib.widgets import Slider, Button, RadioButtons
 from scipy import signal
 from scipy import misc
 from scipy.ndimage import filters
+
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -34,9 +36,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn3_3.clicked.connect(self.on_btn3_3_click)
         self.btn3_4.clicked.connect(self.on_btn3_4_click)
         self.btn4_1.clicked.connect(self.on_btn4_1_click)
-        self.btn4_2.clicked.connect(self.on_btn4_2_click)
-        self.btn5_1.clicked.connect(self.on_btn5_1_click)
-        self.btn5_2.clicked.connect(self.on_btn5_2_click)
 
     for p in sys.path:
         print( p )
@@ -181,7 +180,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cv.destroyWindow('Magnitude')
 
     def on_btn4_1_click(self):
-        pass
+        # get the value from ui
+        Angle = float(self.edtAngle.text())
+        Scale = float(self.edtScale.text())
+        Tx = float(self.edtTx.text())
+        Ty = float(self.edtTy.text())
+
+        # read image
+        img = cv.imread('../Q4_image/Parrot.png')
+
+        # making translation matrix
+        H = np.float32([[1,0,Tx],[0,1,Ty]])
+
+        # translate the image
+        rows,cols = img.shape[:2]
+        tansImg = cv.warpAffine(img,H,(rows,cols))
+
+        # making rotate and scale matrix
+        rows,cols = tansImg.shape[:2]
+        M = cv.getRotationMatrix2D((130+Tx,125+Ty),Angle,Scale)
+
+        # rotating and Scaling the image
+        result = cv.warpAffine(tansImg,M,(rows,cols))
+
+        cv.imshow('Origin Image',img)
+        cv.imshow('Image RST',result)
+        cv.waitKey(0)
+        cv.destroyWindow('Origin Image')
+        cv.destroyWindow('Image RST')
+
 
     def on_btn4_2_click(self):
         pass
@@ -192,8 +219,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def on_btn5_2_click(self):
         pass
-
-    ### ### ###
 
 
 if __name__ == "__main__":
