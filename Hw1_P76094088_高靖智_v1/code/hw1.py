@@ -10,7 +10,15 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 from scipy import signal
 from scipy import misc
 from scipy.ndimage import filters
-
+import glob
+import os
+import random
+import tensorflow as tf
+from tensorflow.keras import models, optimizers, regularizers
+from tensorflow.keras.callbacks import LearningRateScheduler
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.models import load_model
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -36,6 +44,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btn3_3.clicked.connect(self.on_btn3_3_click)
         self.btn3_4.clicked.connect(self.on_btn3_4_click)
         self.btn4_1.clicked.connect(self.on_btn4_1_click)
+        self.btn5_1.clicked.connect(self.on_btn5_1_click)
+        self.btn5_2.clicked.connect(self.on_btn5_2_click)
+        self.btn5_3.clicked.connect(self.on_btn5_3_click)
+        self.btn5_4.clicked.connect(self.on_btn5_4_click)
+        self.btn5_5.clicked.connect(self.on_btn5_5_click)
+        self.Inference.setText("(0~9999)")
 
     for p in sys.path:
         print( p )
@@ -208,17 +222,101 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cv.waitKey(0)
         cv.destroyWindow('Origin Image')
         cv.destroyWindow('Image RST')
-
-
-    def on_btn4_2_click(self):
-        pass
-
     def on_btn5_1_click(self):
-        # edtAngle, edtScale. edtTx, edtTy to access to the ui object
-        pass
+        label_dict={0:"airplain",1:"automobile",2:"bird",3:"cat",4:"deer",5:"dog",6:"frog",7:"horse",8:"ship",9:"truck"}  #轉換標籤為類別名稱用
+
+        def plot_images_labels_prediction(images,labels,prediction,idx,num=10):
+            fig=plt.gcf()                                           #取得 pyplot 物件參考
+            fig.set_size_inches(12, 14)                    #設定畫布大小為 12 吋*14吋
+            
+            for i in range(0, num):                            #依序顯示 num 個子圖
+                ax=plt.subplot(5, 5, i+1)                     #建立 5*5 個子圖中的第 i+1 個
+                ax.imshow(images[idx], cmap='binary')      #顯示子圖
+                title= label_dict[labels[idx][0]]  
+                if len(prediction) > 0:                    #有預測值就加入標題中
+                    title += ",predict=" + str(prediction[idx])
+                ax.set_title(title, fontsize=10)            #設定標題
+                ax.set_xticks([]);                                #不顯示 x 軸刻度
+                ax.set_yticks([]);                                #不顯示 y 軸刻度
+                idx += 1                                              #樣本序號增量 1
+            plt.show()                                                #繪製圖形
+
+        (x_train_image, y_train_label), (x_test_image, y_test_label)=cifar10.load_data() #載入 Cifar-10 資料集
+        plot_images_labels_prediction(x_train_image,y_train_label,[],random.randint(0, 49990),10)    #無預測值
 
     def on_btn5_2_click(self):
-        pass
+        weight_decay = 5e-4
+        batch_size = 128
+        learning_rate = 1e-2
+        dropout_rate = 0.5
+        epoch_num = 20
+        print('################### training hyperparameters ######################')
+        print('hyperparameters:')
+        print('batch size: ', batch_size)
+        print('learning rate: ', learning_rate)
+        print('optimizer: ', optimizers.SGD)
+        print('####################################################################')
+    def on_btn5_3_click(self):
+        weight_decay = 5e-4
+        batch_size = 128
+        learning_rate = 1e-2
+        dropout_rate = 0.5
+        epoch_num = 20
+        def VGG16():
+            model = models.Sequential()
+            model.add(Conv2D(64, (3, 3), activation='relu', padding='same', input_shape=(32, 32, 3), kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(Conv2D(64, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(MaxPooling2D((2, 2)))
+
+            model.add(Conv2D(128, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(Conv2D(128, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(MaxPooling2D((2, 2)))
+
+            model.add(Conv2D(256, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(Conv2D(256, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(Conv2D(256, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(MaxPooling2D((2, 2)))
+
+            model.add(Conv2D(512, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(Conv2D(512, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(Conv2D(512, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(MaxPooling2D((2, 2)))
+
+            model.add(Conv2D(512, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(Conv2D(512, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+            model.add(Conv2D(512, (3, 3), activation='relu', padding='same', kernel_regularizer=regularizers.l2(weight_decay)))
+
+            model.add(Flatten())  # 2*2*512
+            model.add(Dense(4096, activation='relu'))
+            model.add(Dropout(0.5))
+            model.add(Dense(4096, activation='relu'))
+            model.add(Dropout(0.5))
+            model.add(Dense(10, activation='softmax'))
+
+            return model
+        # get model
+        model = VGG16()
+
+        # show
+        print('######################## model structure ##########################')
+        model.summary()
+        print('###################################################################')
+    def on_btn5_4_click(self):
+        acc = cv.imread( '../Q5_Image/accuracy.png', cv.IMREAD_COLOR )
+        loss = cv.imread( '../Q5_Image/loss.png', cv.IMREAD_COLOR )
+        cv.imshow('accuracy', acc)
+        cv.imshow('loss', loss)
+        cv.waitKey(0)
+        cv.destroyWindow('acc')
+        cv.destroyWindow('loss')
+
+    def on_btn5_5_click(self):
+        Inference = int(self.Inference.text())
+        (x_train_image, y_train_label), (x_test_image, y_test_label)=cifar10.load_data() #載入 Cifar-10 資料集
+        testimg = x_test_image[Inference]
+        cv.imshow('Test Image', testimg)
+        cv.waitKey(0)
+        cv.destroyWindow('Test Image')
 
 
 if __name__ == "__main__":
